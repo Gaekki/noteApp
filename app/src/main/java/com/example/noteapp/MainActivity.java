@@ -1,5 +1,7 @@
 package com.example.noteapp;
 
+import android.arch.persistence.room.Insert;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -8,9 +10,11 @@ import com.example.noteapp.callbacks.NoteEventListener;
 import com.example.noteapp.db.NotesDB;
 import com.example.noteapp.db.NotesDao;
 import com.example.noteapp.model.Note;
+import com.example.noteapp.utils.NoteUtils;
 
 
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -126,11 +130,50 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     }
 
     @Override
-    public void onNoteLongClick(Note note) {
+    public void onNoteLongClick(final Note note) {
         // TODO: 2019-10-06 note long clicked : delete, share..
 
-        Log.d(TAG,"onNoteLongClick: " + note.getId());
-    }
-}
+        new AlertDialog.Builder(this)
+
+                .setTitle(R.string.app_name)
+
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // TODO: 2019-10-06 delete Note from database and refresh
+                        dao.deleteNote(note);
+                        loadNotes();
+                    }
+
+                })
+
+                .setNegativeButton("Share", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // TODO: 2019-10-06 share note text
+                        Intent share = new Intent(Intent.ACTION_SEND);
+                        String text = note.getNoteText() + "\n create on :"
+                                + NoteUtils.dateFromLong(note.getNoteDate()) +
+                                "by :" + getString(R.string.app_name);
+
+                        share.setType("text/plain");
+                        share.putExtra(Intent.EXTRA_TEXT, text);
+                        startActivity(share);
+
+                    }
+                })
+                .create()
+                .show();
+
+                }
+        }
+
 
 

@@ -24,6 +24,7 @@ public class EditeNoteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edite_note);
+
         inputNote = findViewById(R.id.input_note);
         dao = NotesDB.getInstance(this).notesDao();
         if (getIntent().getExtras()!=null){
@@ -64,5 +65,4 @@ public class EditeNoteActivity extends AppCompatActivity {
         }
 
     }
-
 }
