@@ -26,7 +26,11 @@ public class EditeNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edite_note);
         inputNote = findViewById(R.id.input_note);
         dao = NotesDB.getInstance(this).notesDao();
-
+        if (getIntent().getExtras()!=null){
+            int id = getIntent().getExtras().getInt(NOTE_EXTRA_Key, 0);
+            temp = dao.getNoteById(id);
+            inputNote.setText(temp.getNoteText());
+        }else temp=new Note();
 
     }
     @Override
@@ -48,8 +52,13 @@ public class EditeNoteActivity extends AppCompatActivity {
         String text = inputNote.getText().toString();
         if (!text.isEmpty()) {
             long date = new Date().getTime(); // get  system time
-            Note note = new Note(text,date);
-            dao.insertNote(note);
+
+            temp.setNoteDate(date);
+            temp.setNoteText(text);
+
+            if (temp.getId() == -1)
+                dao.insertNote(temp);
+            else dao.updateNote(temp);
 
             finish(); // return to the MainActivity
         }

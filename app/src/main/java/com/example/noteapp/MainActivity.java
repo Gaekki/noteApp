@@ -4,23 +4,30 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.noteapp.adapters.NotesAdapter;
+import com.example.noteapp.callbacks.NoteEventListener;
 import com.example.noteapp.db.NotesDB;
 import com.example.noteapp.db.NotesDao;
 import com.example.noteapp.model.Note;
+
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import static com.example.noteapp.EditeNoteActivity.NOTE_EXTRA_Key;
+
+public class MainActivity extends AppCompatActivity implements NoteEventListener {
+    private static final String TAG = "MainActivity";
     private RecyclerView recyclerView;
     private ArrayList<Note> notes;
     private NotesAdapter adapter;
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         this.notes.addAll(list);
         this.adapter = new NotesAdapter(this, this.notes);
         this.recyclerView.setAdapter(adapter);
+        this.adapter.setListener(this);
+
         // showEmptyView();
         // adapter.notifyDataSetChanged();
     }
@@ -106,7 +115,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onNoteClick(Note note) {
+        // TODO: 2019-10-06 note clicked : edit note
 
+        Intent edit = new Intent(this,EditeNoteActivity.class);
+        edit.putExtra(NOTE_EXTRA_Key, note.getId());
+        startActivity(edit);
+
+    }
+
+    @Override
+    public void onNoteLongClick(Note note) {
+        // TODO: 2019-10-06 note long clicked : delete, share..
+
+        Log.d(TAG,"onNoteLongClick: " + note.getId());
+    }
 }
 
 
