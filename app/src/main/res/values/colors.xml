@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="view_backg_color">#c7c7C7</color>
+    <color name="view_backg2_color">#fff</color>
 
 </resources>

@@ -1,7 +1,7 @@
 <resources>
-<string name="app_name">noteApp</string>
+<string name="app_name">Note App</string>
 <string name="action_settings">Settings</string>
 <string name="no_notes">No Notes !</string>
-<string name="whats_in_your_mind">Whats in your mind</string>
+<string name="whats_in_your_mind">Take note here!</string>
 
 </resources>

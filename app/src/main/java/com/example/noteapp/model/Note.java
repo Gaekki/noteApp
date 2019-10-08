@@ -14,6 +14,8 @@ public class Note {
     @ColumnInfo(name = "date")
     private long noteDate;
 
+    public Note() {}
+
     public Note(String noteText, long noteDate) {
         this.noteText = noteText;
         this.noteDate = noteDate;
@@ -37,6 +39,13 @@ public class Note {
     }
     public void setId(int id) {
         this.id = id;
+    }
+    @Override
+    public String toString() {
+        return "Note{" +
+                "id=" + id +
+                ", noteDate=" + noteDate +
+                '}';
     }
 
 

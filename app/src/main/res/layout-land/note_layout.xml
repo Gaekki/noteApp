@@ -3,50 +3,44 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@color/view_backg2_color">
+    android:orientation="horizontal" >
 
     <android.support.v7.widget.AppCompatCheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:visibility="gone"
-        />
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/note_text"
-            android:layout_width="match_parent"
+            android:layout_width="763dp"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:layout_marginBottom="3dp"
-            android:maxLines="3"
-            android:textSize="18sp"
-            />
+            android:maxLines="500"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/note_date"
-            android:layout_width="wrap_content"
+            android:layout_width="436dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginBottom="5dp"
             android:layout_marginTop="3dp"
-            android:textSize="12sp"
-            />
+            android:layout_marginBottom="5dp"
+            android:textSize="12sp" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
+            android:layout_width="646dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:background="@color/view_backg_color"
-            />
+            android:background="@color/view_backg_color" />
 
 
     </LinearLayout>
