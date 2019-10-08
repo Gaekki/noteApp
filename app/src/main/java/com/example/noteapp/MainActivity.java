@@ -2,6 +2,8 @@ package com.example.noteapp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.GridLayoutManager;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
     private FloatingActionButton fab;
 
+    private int currentScreenOrientation;
+
 
 
     @Override
@@ -46,9 +51,21 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         // init recyclerView
+        int currentScreenOrientation = this.getResources().getConfiguration().orientation;
         recyclerView = findViewById(R.id.notes_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        // portrait mode vertical list
+        if (currentScreenOrientation == Configuration.ORIENTATION_PORTRAIT){
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
+        // landscape mode horizontal list
+        if (currentScreenOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+         recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        }
+
 
         // init fab Button
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -62,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
         dao = NotesDB.getInstance(this).notesDao();
     }
+
 
 
     private void loadNotes() {

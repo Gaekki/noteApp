@@ -3,7 +3,15 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@color/view_backg2_color">
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:visibility="gone"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,38 +20,34 @@
         android:layout_marginEnd="10dp"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="646dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:background="@color/view_backg_color" />
 
         <TextView
             android:id="@+id/note_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="3dp"
-            android:maxLines="5"
-            android:textSize="18sp" />
+            android:maxLines="3"
+            android:textSize="35sp" />
+
         <TextView
             android:id="@+id/note_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:textSize="12sp" />
+            android:textSize="20sp" />
 
-
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="2dp"
+            android:background="@color/view_backg_color" />
 
     </LinearLayout>
 
-    <android.support.v7.widget.AppCompatCheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:visibility="gone" />
 
 </LinearLayout>
