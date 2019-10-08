@@ -14,17 +14,21 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.GridLayoutManager;
 
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.noteapp.adapters.NotesAdapter;
+import com.example.noteapp.callbacks.MultiActionModeCallback;
 import com.example.noteapp.callbacks.NoteEventListener;
 import com.example.noteapp.db.NotesDB;
 import com.example.noteapp.db.NotesDao;
 import com.example.noteapp.model.Note;
 import com.example.noteapp.utils.NoteUtils;
 import static com.example.noteapp.EditeNoteActivity.NOTE_EXTRA_Key;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +41,11 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     private ArrayList<Note> notes;
     private NotesAdapter adapter;
     private NotesDao dao;
+    private MultiActionModeCallback actionModeCallback;
 
     private FloatingActionButton fab;
 
-    private int currentScreenOrientation;
+    private int checkedCount = 0;
 
 
 
@@ -90,28 +95,26 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         // set listener to adapter
         this.adapter.setListener(this);
         this.recyclerView.setAdapter(adapter);
-       // showEmptyView();
+        showEmptyView();
 
 
     }
 
-    /**
-     * when no notes show msg in main_layout
-     */
-    //private void showEmptyView() {
-    //    if (notes.size() == 0) {
-    //        this.recyclerView.setVisibility(View.GONE);
-    //        findViewById(R.id.empty_notes_view).setVisibility(View.VISIBLE);
+    // if empty note, showing message "empty note"
 
-    //    } else {
-    //        this.recyclerView.setVisibility(View.VISIBLE);
-    //        findViewById(R.id.empty_notes_view).setVisibility(View.GONE);
-    //    }
-   // }
+    private void showEmptyView() {
+        if (notes.size() == 0) {
+            this.recyclerView.setVisibility(View.GONE);
+            findViewById(R.id.empty_notes_view).setVisibility(View.VISIBLE);
 
-    /**
-     * Start EditNoteActivity.class for Create New Note
-     */
+        } else {
+            this.recyclerView.setVisibility(View.VISIBLE);
+            findViewById(R.id.empty_notes_view).setVisibility(View.GONE);
+        }
+    }
+
+    // Start EditNoteActivity.class for Create New Note
+
     private void onAddNewNote() {
         startActivity(new Intent(this, EditeNoteActivity.class));
 
@@ -158,7 +161,99 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     @Override
     public void onNoteLongClick(final Note note) {
         // TODO: 2019-10-07 note long clicked : delete, share
-        new AlertDialog.Builder(this)
+
+        note.setChecked(true);
+        checkedCount = 1;
+        adapter.setMultiCheckMode(true);
+
+        adapter.setListener(new NoteEventListener() {
+            @Override
+            public void onNoteClick(Note note) {
+                note.setChecked((!note.isChecked()));
+                if (note.isChecked())
+                    checkedCount++;
+                else checkedCount--;
+
+                if (checkedCount > 1) {
+                    actionModeCallback.changeShareItemVisible(false);
+                } else actionModeCallback.changeShareItemVisible(true);
+
+                if (checkedCount == 0) {
+                    actionModeCallback.getAction().finish();
+                }
+                actionModeCallback.setCount(checkedCount + "/" + notes.size());
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNoteLongClick(Note note) {
+
+            }
+        });
+
+        actionModeCallback = new MultiActionModeCallback() {
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.action_delete_notes)
+                    onDeleteMultiNotes();
+                else if (menuItem.getItemId() == R.id.action_share_note)
+                    onShareNote();
+
+                actionMode.finish();
+                return false;
+            }
+        };
+
+        startActionMode(actionModeCallback);
+
+        fab.setVisibility(View.GONE);
+        actionModeCallback.setCount(checkedCount + "/" + notes.size());
+    }
+
+    private void onDeleteMultiNotes() {
+        // TODO: 22/07/2018 delete multi notes
+
+        List<Note> chackedNotes = adapter.getCheckedNotes();
+        if (chackedNotes.size() != 0) {
+            for (Note note : chackedNotes) {
+                dao.deleteNote(note);
+            }
+            // refresh Notes
+            loadNotes();
+            Toast.makeText(this, chackedNotes.size() + " Note(s) Delete successfully !", Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(this, "No Note(s) selected", Toast.LENGTH_SHORT).show();
+
+        //adapter.setMultiCheckMode(false);
+    }
+
+    private void onShareNote() {
+        // TODO: 22/07/2018  we need share just one Note not multi
+
+        Note note = adapter.getCheckedNotes().get(0);
+        // TODO: 22/07/2018 do your logic here to share note ; on social or something else
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        String notetext = note.getNoteText() + "\n\n Create on : " +
+                NoteUtils.dateFromLong(note.getNoteDate()) + "\n  By :" +
+                getString(R.string.app_name);
+        share.putExtra(Intent.EXTRA_TEXT, notetext);
+        startActivity(share);
+
+
+    }
+
+    @Override
+    public void onActionModeFinished(ActionMode mode) {
+        super.onActionModeFinished(mode);
+
+        adapter.setMultiCheckMode(false); // uncheck the notes
+        adapter.setListener(this); // set back the old listener
+        fab.setVisibility(View.VISIBLE);
+    }
+
+
+
+        /*new AlertDialog.Builder(this)
 
                 .setTitle(R.string.app_name)
 
@@ -196,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
                 })
                 .create()
                 .show();
-    }
+        */
+
 
 }

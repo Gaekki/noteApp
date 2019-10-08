@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.example.noteapp.db.NotesDB;
@@ -39,7 +40,10 @@ public class EditeNoteActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.edite_note_menu, menu);
+        // while editing/adding new note, screen doesn't turn off
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         return super.onCreateOptionsMenu(menu);
+
     }
 
     @Override
@@ -65,6 +69,8 @@ public class EditeNoteActivity extends AppCompatActivity {
                 dao.updateNote(temp); // change text and date and update note on database
             }
 
+            // always screen on mode is off
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             finish(); // return to the MainActivity
         }
 

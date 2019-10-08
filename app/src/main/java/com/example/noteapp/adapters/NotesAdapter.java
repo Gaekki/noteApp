@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.noteapp.MainActivity;
@@ -21,6 +22,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
     private Context context;
     private ArrayList<Note> notes;
     private NoteEventListener listener;
+    private boolean multiCheckMode = false;
 
     public NotesAdapter(Context context, ArrayList<Note> notes) {
         this.context = context;
@@ -57,6 +59,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
                 }
             });
 
+            // multi checkbox
+            if (multiCheckMode) {
+                holder.checkBox.setVisibility(View.VISIBLE);
+                holder.checkBox.setChecked(note.isChecked());
+            } else holder.checkBox.setVisibility(View.GONE);
+
         }
     }
     @Override
@@ -70,22 +78,38 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
 
     class NoteHolder extends RecyclerView.ViewHolder {
         TextView noteText, noteDate;
+        CheckBox checkBox;
 
         public NoteHolder(View itemView){
             super(itemView);
             noteDate=itemView.findViewById(R.id.note_date);
             noteText=itemView.findViewById(R.id.note_text);
+            checkBox = itemView.findViewById(R.id.checkbox);
         }
-
-
-
     }
 
     public void setListener(NoteEventListener listener) {
         this.listener = listener;
     }
 
+    public void setMultiCheckMode(boolean multiCheckMode) {
+        this.multiCheckMode = multiCheckMode;
+        if (!multiCheckMode)
+            for (Note note : this.notes) {
+                note.setChecked(false);
+            }
+        notifyDataSetChanged();
+    }
 
+    public List<Note> getCheckedNotes() {
+        List<Note> checkedNotes = new ArrayList<>();
+        for (Note n : this.notes) {
+            if (n.isChecked())
+                checkedNotes.add(n);
+        }
+
+        return checkedNotes;
+    }
 
 
 }
