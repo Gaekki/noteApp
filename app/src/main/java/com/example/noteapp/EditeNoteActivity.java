@@ -1,5 +1,10 @@
 package com.example.noteapp;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,11 +25,23 @@ public class EditeNoteActivity extends AppCompatActivity {
     private Note temp;
     public static final String NOTE_EXTRA_Key = "note_id";
 
+    private SensorManager ss;
+    private float acelVal;
+    private float acelLast;
+    private float shake;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edite_note);
 
+        //sensor
+        ss = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
+        shake = 0.00f;
 
 
         inputNote = findViewById(R.id.input_note);
@@ -54,6 +71,7 @@ public class EditeNoteActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     private void onSaveNote() {
         // TODO: 20/06/2018 Save Note
         String text = inputNote.getText().toString();
@@ -62,7 +80,7 @@ public class EditeNoteActivity extends AppCompatActivity {
             // if  exist update els crete new
             if (temp == null) {
                 temp = new Note(text, date);
-                dao.insertNote(temp); // create new note and inserted to database
+                dao.insertNote(temp); // create new note and insert to database
             } else {
                 temp.setNoteText(text);
                 temp.setNoteDate(date);
@@ -73,6 +91,29 @@ public class EditeNoteActivity extends AppCompatActivity {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             finish(); // return to the MainActivity
         }
-
     }
+    private final SensorEventListener sensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x * x + y * y + z * z));
+            Float delta = acelVal - acelLast;
+            shake = shake * 0.9f + delta;
+            if (shake > 20) {
+                inputNote.setText("");
+            }
+
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+
 }

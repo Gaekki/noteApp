@@ -52,12 +52,6 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
     private int checkedCount = 0;
 
-    private SensorManager ss;
-    private float acelVal;
-    private float acelLast;
-     private float shake;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +59,6 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //sensor
-        ss = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-       ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-
-       acelVal = SensorManager.GRAVITY_EARTH;
-       acelLast = SensorManager.GRAVITY_EARTH;
-       shake = 0.00f;
-
 
         // init recyclerView
         int currentScreenOrientation = this.getResources().getConfiguration().orientation;
@@ -102,30 +87,6 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
         dao = NotesDB.getInstance(this).notesDao();
     }
-
-   private final SensorEventListener sensorListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            float x = sensorEvent.values[0];
-            float y = sensorEvent.values[1];
-            float z = sensorEvent.values[2];
-
-            acelLast = acelVal;
-            acelVal = (float) Math.sqrt((double) (x * x + y * y + z * z));
-            Float delta = acelVal - acelLast;
-            shake = shake * 0.9f + delta;
-            if (shake > 20) {
-                onAddNewNote();
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-    };
-
-
 
 
     private void loadNotes() {
@@ -294,49 +255,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         fab.setVisibility(View.VISIBLE);
     }
 
-
-
-        /*new AlertDialog.Builder(this)
-
-                .setTitle(R.string.app_name)
-
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // TODO: 2019-10-06 delete Note from database and refresh
-                        dao.deleteNote(note);
-                        loadNotes();
-                    }
-
-                })
-
-                .setNegativeButton("Share", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // TODO: 2019-10-06 share note text
-                        Intent share = new Intent(Intent.ACTION_SEND);
-                        String text = note.getNoteText() + "\n create on :"
-                                + NoteUtils.dateFromLong(note.getNoteDate()) +
-                                "by :" + getString(R.string.app_name);
-
-                        share.setType("text/plain");
-                        share.putExtra(Intent.EXTRA_TEXT, text);
-                        startActivity(share);
-
-                    }
-                })
-                .create()
-                .show();
-        */
-
-    }
+}
 
 
 
