@@ -6,9 +6,7 @@ import android.view.MenuItem;
 
 import com.example.noteapp.R;
 
-/**
- * Created by ixi.Dv on 22/07/2018.
- */
+
 public abstract class MultiActionModeCallback implements ActionMode.Callback {
     private ActionMode action;
     private MenuItem countItem;
@@ -33,16 +31,11 @@ public abstract class MultiActionModeCallback implements ActionMode.Callback {
 
     }
 
-    public void setCount(String chackedCount) {
+    public void setCount(String checkedCount) {
         if (countItem != null)
-            this.countItem.setTitle(chackedCount);
+            this.countItem.setTitle(checkedCount);
     }
 
-    /**
-     * if checked count > 1 hide shareItem else show it
-     *
-     * @param b :visible
-     */
     public void changeShareItemVisible(boolean b) {
         shareItem.setVisible(b);
     }

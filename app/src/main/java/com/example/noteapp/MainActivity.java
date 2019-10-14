@@ -1,9 +1,14 @@
 package com.example.noteapp;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 
 import android.support.design.widget.FloatingActionButton;
@@ -47,14 +52,27 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
     private int checkedCount = 0;
 
+    private SensorManager ss;
+    private float acelVal;
+    private float acelLast;
+     private float shake;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //sensor
+        ss = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+       ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+
+       acelVal = SensorManager.GRAVITY_EARTH;
+       acelLast = SensorManager.GRAVITY_EARTH;
+       shake = 0.00f;
 
 
         // init recyclerView
@@ -73,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
 
         // init fab Button
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,6 +102,29 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
         dao = NotesDB.getInstance(this).notesDao();
     }
+
+   private final SensorEventListener sensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x * x + y * y + z * z));
+            Float delta = acelVal - acelLast;
+            shake = shake * 0.9f + delta;
+            if (shake > 20) {
+                onAddNewNote();
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+
 
 
 
@@ -124,11 +165,14 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -161,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     @Override
     public void onNoteLongClick(final Note note) {
         // TODO: 2019-10-07 note long clicked : delete, share
-
         note.setChecked(true);
         checkedCount = 1;
         adapter.setMultiCheckMode(true);
@@ -213,15 +256,15 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     private void onDeleteMultiNotes() {
         // TODO: 22/07/2018 delete multi notes
 
-        List<Note> chackedNotes = adapter.getCheckedNotes();
-        if (chackedNotes.size() != 0) {
-            for (Note note : chackedNotes) {
+        List<Note> checkedNotes = adapter.getCheckedNotes();
+        if (checkedNotes.size() != 0) {
+            for (Note note : checkedNotes) {
                 dao.deleteNote(note);
             }
             // refresh Notes
             loadNotes();
-            Toast.makeText(this, chackedNotes.size() + " Note(s) Delete successfully !", Toast.LENGTH_SHORT).show();
-        } else Toast.makeText(this, "No Note(s) selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, checkedNotes.size() + " Note Deleted successfully !", Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(this, "No Note selected", Toast.LENGTH_SHORT).show();
 
         //adapter.setMultiCheckMode(false);
     }
@@ -293,5 +336,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
                 .show();
         */
 
+    }
 
-}
+
+
