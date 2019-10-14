@@ -1,17 +1,25 @@
 package com.example.noteapp;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.noteapp.db.NotesDB;
 import com.example.noteapp.db.NotesDao;
@@ -29,6 +37,7 @@ public class EditeNoteActivity extends AppCompatActivity {
     private float acelVal;
     private float acelLast;
     private float shake;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,21 +108,63 @@ public class EditeNoteActivity extends AppCompatActivity {
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
 
+            EditText editNote1 = findViewById(R.id.input_note);
+            String editNote = editNote1.getText().toString();
 
             acelLast = acelVal;
             acelVal = (float) Math.sqrt((double) (x * x + y * y + z * z));
             Float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
+
             if (shake > 20) {
-                inputNote.setText("");
+                if (TextUtils.isEmpty(editNote)){
+                    Toast.makeText(EditeNoteActivity.this," Nothing to delete!!", Toast.LENGTH_SHORT).show();}
+                else { openDialog(); }
             }
-
         }
-
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
+        public void onAccuracyChanged(Sensor sensor, int accuracy) { }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        ss.unregisterListener(sensorListener);
+        super.onPause();
+    }
+    
+    public void openDialog(){
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        TextView title = new TextView(this);
+        title.setText("Clear All");
+        title.setPadding(10, 10, 10, 10);   // Set Position
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.BLACK);
+        title.setTextSize(20);
+        alertDialog.setCustomTitle(title);
+
+        // Set Message
+        TextView msg = new TextView(this);
+        // Message Properties
+        msg.setText("\n Are you sure you want to clear all the text?");
+        msg.setGravity(Gravity.CENTER_HORIZONTAL);
+        msg.setTextColor(Color.BLACK);
+        alertDialog.setView(msg);
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // Perform Action on Button
+                inputNote.setText("");
+
+            }
+        });
+        alertDialog.show();
+
+    }
+
 
 }

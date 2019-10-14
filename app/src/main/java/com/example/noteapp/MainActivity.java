@@ -23,6 +23,7 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.noteapp.adapters.NotesAdapter;
@@ -52,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
     private int checkedCount = 0;
 
+    private SensorManager ss;
+    private float acelVal;
+    private float acelLast;
+    private float shake;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,14 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //sensor
+        ss = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
+        shake = 0.00f;
 
         // init recyclerView
         int currentScreenOrientation = this.getResources().getConfiguration().orientation;
@@ -152,7 +165,17 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
     protected void onResume() {
         super.onResume();
         loadNotes();
+        ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        //Toast.makeText(MainActivity.this," Nothing to delete!!", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    protected void onPause() {
+        ss.unregisterListener(sensorListener);
+        super.onPause();
+    }
+
+
 
     @Override
     public void onNoteClick(Note note) {
@@ -254,6 +277,27 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
         adapter.setListener(this); // set back the old listener
         fab.setVisibility(View.VISIBLE);
     }
+
+    private final SensorEventListener sensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x * x + y * y + z * z));
+            Float delta = acelVal - acelLast;
+            shake = shake * 0.9f + delta;
+                if (shake>20) {onAddNewNote();}
+
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+
+    };
 
 }
 
