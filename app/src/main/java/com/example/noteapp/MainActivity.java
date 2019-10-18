@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
         //sensor
         ss = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
 
         acelVal = SensorManager.GRAVITY_EARTH;
         acelLast = SensorManager.GRAVITY_EARTH;
@@ -171,8 +170,8 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
     @Override
     protected void onPause() {
-        ss.unregisterListener(sensorListener);
         super.onPause();
+        ss.unregisterListener(sensorListener);
     }
 
 
@@ -258,15 +257,16 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
 
         Note note = adapter.getCheckedNotes().get(0);
         // TODO: 22/07/2018 do your logic here to share note ; on social or something else
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("text/plain");
+        Intent share = new Intent();
+        share.setAction(Intent.ACTION_SEND);
         String notetext = note.getNoteText() + "\n\n Create on : " +
                 NoteUtils.dateFromLong(note.getNoteDate()) + "\n  By :" +
                 getString(R.string.app_name);
-        share.putExtra(Intent.EXTRA_TEXT, notetext);
-        startActivity(share);
-
-
+        share.putExtra(Intent.EXTRA_TEXT,notetext);
+        share.setType("text/plain");
+        Intent shareIntent = Intent.createChooser(share, null);
+        startActivity(shareIntent);
+        
     }
 
     @Override
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements NoteEventListener
             acelVal = (float) Math.sqrt((double) (x * x + y * y + z * z));
             Float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
-                if (shake>20) {onAddNewNote();}
+                if (shake>25) {onAddNewNote();}
 
         }
         @Override

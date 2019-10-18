@@ -46,7 +46,7 @@ public class EditeNoteActivity extends AppCompatActivity {
 
         //sensor
         ss = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        ss.registerListener(sensorListener, ss.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+
 
         acelVal = SensorManager.GRAVITY_EARTH;
         acelLast = SensorManager.GRAVITY_EARTH;
@@ -116,9 +116,9 @@ public class EditeNoteActivity extends AppCompatActivity {
             Float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
 
-            if (shake > 20) {
+            if (shake > 30) {
                 if (TextUtils.isEmpty(editNote)){
-                    Toast.makeText(EditeNoteActivity.this," Nothing to delete!!", Toast.LENGTH_SHORT).show();}
+                    Toast.makeText(EditeNoteActivity.this," Please Take Note!!", Toast.LENGTH_SHORT).show();}
                 else { openDialog(); }
             }
         }
@@ -137,7 +137,7 @@ public class EditeNoteActivity extends AppCompatActivity {
         ss.unregisterListener(sensorListener);
         super.onPause();
     }
-    
+
     public void openDialog(){
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         TextView title = new TextView(this);
